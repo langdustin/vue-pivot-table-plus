@@ -237,9 +237,12 @@ export default {
     _sortFields (fieldsOrder) {
       const appendSortOption = function (fields) {
         return fields.map((field) => {
-          console.log('in package');
-          if (fieldsOrder[field.label] === 'desc') {
-            return { ...field, sort: (x, y) => naturalSort(y, x) }
+          if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'desc') {
+            return { ...field, sort: function() {return -1;} }
+          } else if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'individual') {
+             return { ...field, sort: function() {return 1;} }
+          } else {
+            return { ...field, sort: function() {return 1;} }
           }
         })
       }
