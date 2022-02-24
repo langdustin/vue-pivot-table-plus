@@ -239,9 +239,6 @@ export default {
         return fields.map((field) => {
           if (fieldsOrder[field.label] === 'desc') {
             return { ...field, sort: (x, y) => naturalSort(y, x) }
-          } else {
-            let { sort, ..._field } = field // remove 'sort' key
-            return _field
           }
         })
       }
