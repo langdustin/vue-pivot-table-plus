@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="kiresult-pivot">
     <!-- Top row -->
     <div v-if="showSettings" class="row grid-x flex-nowrap mb-4">
       <!-- Disabled fields -->
@@ -17,7 +17,11 @@
 
     <div class="row flex-nowrap grid-x mb-4" v-if="showSettings">
       <!-- Top left zone - TODO: renderer select menu -->
-      <div class="left-col"></div>
+      <div class="left-col">
+        <div class="btn btn-primary btn-sm"  @click="_clickedSaveButton('csv')">
+          CSV-Export
+        </div>
+      </div>
 
       <!-- Horizontal fields -->
       <div class="col">
@@ -30,7 +34,7 @@
           </div>
         </draggable>
         <p v-if="internal.colFields.length === 0" class="drag-area-placeholder text-secondary">{{ colsLabelText || 'Drag fields here'}}</p>
-        <div v-else class="drag-area-clear-button circle-background bg-primary" v-b-tooltip:hover title="Clear column fields" @click="_resetCols"></div>
+        <div v-else class="drag-area-clear-button circle-background bg-primary" title="Clear column fields" @click="_resetCols"></div>
       </div>
     </div>
 
@@ -39,14 +43,14 @@
       <div class="left-col" v-if="showSettings">
         <draggable v-model="internal.rowFields" :options="{ group: 'fields' }" @start="_start" @end="_end" class="d-flex flex-column align-items-start drag-area border-primary" :class="dragAreaClass">
           <div v-for="field in internal.rowFields" :key="'row-' + field.label">
-            <div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" v-b-tooltip.hover :title="field.label" @click="_fieldClicked(field.label)">
+            <div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" :title="field.label" @click="_fieldClicked(field.label)">
               <div class="btn-label text-truncate mr-2">{{ field.label }}</div>
               <div class="sort-dict" :class="{ '--desc': internal.fieldsOrder[field.label] === 'desc' }"/>
             </div>
           </div>
         </draggable>
         <p v-if="internal.rowFields.length === 0" class="drag-area-placeholder text-secondary">{{ rowsLabelText || 'Drag fields here'}}</p>
-        <div v-else class="drag-area-clear-button circle-background bg-primary" v-b-tooltip:hover title="Clear row fields" @click="_resetRows"></div>
+        <div v-else class="drag-area-clear-button circle-background bg-primary" title="Clear row fields" @click="_resetRows"></div>
       </div>
 
       <!-- Table -->
@@ -77,12 +81,6 @@
         </transition>
       </div>
 
-      <div v-if="showSettings" class="table-option-button circle-background bg-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-b-tooltip:hover title="Show menu"></div>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <button ref="pivot-copy-button" class="dropdown-item" >Copy table to clipboard</button>
-        <button class="dropdown-item" @click="_clickedSaveButton('csv')">Save table in CSV</button>
-        <button class="dropdown-item" @click="_clickedSaveButton('tsv')">Save table in TSV</button>
-      </div>
     </div>
   </div>
 </template>
@@ -177,13 +175,13 @@ export default {
   },
   mounted () {
     const self = this
-    const clipboard = new Clipboard(self.$refs['pivot-copy-button'], {
+    /*const clipboard = new Clipboard(self.$refs['pivot-copy-button'], {
       target: () => self.$refs.pivottable.$el
     })
     clipboard.on('success', (e) => {
       e.clearSelection()
       self.onPivotTableCopied(e)
-    })
+    })*/
   },
   computed: {
     dragAreaClass: function () {
@@ -237,11 +235,15 @@ export default {
     _sortFields (fieldsOrder) {
       const appendSortOption = function (fields) {
         return fields.map((field) => {
-          if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'desc') {
+          if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'spend_asc') {
             return { ...field, sort: function() {return -1;} }
-          } else if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'individual') {
+          } else if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'spend_desc') {
              return { ...field, sort: function() {return 1;} }
-          } else {
+          } else if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'naturalSort_asc') {
+             return { ...field, sort: (x, y) => naturalSort(y, x) }
+          } else if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'naturalSort_desc') {
+             return { ...field, sort: (x, y) => naturalSort(y, x)*(-1) }
+          }else {
             return { ...field, sort: function() {return 1;} }
           }
         })
@@ -251,11 +253,16 @@ export default {
     },
     _fieldClicked (label) {
       const orgVal = this.internal.fieldsOrder[label]
-      if (orgVal) {
-        // recreate instance for reactivity
+      if (orgVal == 'spend_asc') {
+        this.internal.fieldsOrder = { ...this.internal.fieldsOrder, [label]: 'spend_desc' }
+      } else if (orgVal == 'spend_desc'){
+        this.internal.fieldsOrder = { ...this.internal.fieldsOrder, [label]: 'spend_asc' }
+      } else if (orgVal == 'naturalSort_asc'){
+        this.internal.fieldsOrder = { ...this.internal.fieldsOrder, [label]: 'naturalSort_desc' }
+      } else if (orgVal == 'naturalSort_desc'){
+        this.internal.fieldsOrder = { ...this.internal.fieldsOrder, [label]: 'naturalSort_asc' }
+      } else if (orgVal == 'naturalSort_desc'){
         this.internal.fieldsOrder = { ...this.internal.fieldsOrder, [label]: undefined }
-      } else {
-        this.internal.fieldsOrder = { ...this.internal.fieldsOrder, [label]: 'desc' }
       }
       this._sortFields(this.internal.fieldsOrder)
     },
@@ -268,6 +275,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+@import 'bootstrap/scss/bootstrap.scss';
+
 $base-space: 0.75rem;
 $border-space: 0.0625rem;
 $padding-space: 0.9375rem;
@@ -419,4 +429,45 @@ $hamburger-svg: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/
   opacity: 0;
   transition: all 0.7s ease;
 }
+
+    // pivot-table styling
+
+    .kiresult-pivot .border-primary {
+        border: 2px dashed #055864 !important;
+    }
+
+    .kiresult-pivot .drag-area-placeholder {
+        position: relative !important;
+        top: -2.5rem !important;
+        left: 1.5rem !important;
+    }
+
+    .kiresult-pivot .mb-4 {
+        margin-bottom: 12px !important;
+    }
+
+    .kiresult-pivot .col {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+
+    .kiresult-pivot .bg-primary {
+        background-color: #055864 !important;
+    }
+
+    .kiresult-pivot .btn-primary {
+        color: #fff;
+        background-color: #055864;
+        border-color: #055864;
+    }
+
+    .kiresult-pivot .text-muted {
+        color: transparent !important;
+    }
+
+    .kiresult-pivot .alert-warning {
+        color: #000 !important;
+        background-color: #f5f5f5 !important;
+        border: none !important;
+    }
 </style>

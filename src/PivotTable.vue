@@ -2,7 +2,7 @@
   <div class="table-responsive">
     <template v-if="isDataLoading">
       <slot name="loading">
-        Loading...
+        Lädt...
       </slot>
     </template>
     <div v-else-if="data.length === 0" class="alert alert-warning" role="alert">
@@ -332,6 +332,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'bootstrap/scss/bootstrap.scss';
+
+  .kiresult-pivot .bg-primary {
+      background-color: #055864 !important;
+  }
+
+  .kiresult-pivot .btn-primary {
+      color: #fff;
+      background-color: #055864;
+      border-color: #055864;
+  }
+
+  .kiresult-pivot .text-muted {
+      color: transparent !important;
+  }
+
+  .kiresult-pivot .alert-warning {
+      color: #000 !important;
+      background-color: #f5f5f5 !important;
+      border: none !important;
+  }
+
 td {
   min-width: 100px;
 }
