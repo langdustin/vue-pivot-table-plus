@@ -18,18 +18,19 @@
     <div class="row flex-nowrap grid-x mb-4" v-if="showSettings">
       <!-- Top left zone - TODO: renderer select menu -->
       <div class="left-col">
-        <div class="btn btn-primary btn-sm"  @click="_clickedSaveButton('csv')">
+        <!--<div class="btn btn-primary btn-sm"  @click="_clickedSaveButton('csv')">
           CSV-Export
-        </div>
+        </div>-->
       </div>
 
       <!-- Horizontal fields -->
       <div class="col">
         <draggable v-model="internal.colFields" :options="{ group: 'fields' }" @start="_start" @end="_end" class="d-flex flex-row drag-area border-primary flex-wrap" :class="dragAreaClass">
           <div v-for="field in internal.colFields" :key="'col-' + field.label">
-            <div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" @click="_fieldClicked(field.label)">
+            <!--<div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" @click="_fieldClicked(field.label)">-->
+            <div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center">
               <div class="btn-label text-truncate mr-2">{{ field.label }}</div>
-              <div class="sort-dict ml-auto" :class="{ '--desc': internal.fieldsOrder[field.label] === 'desc' }"/>
+              <!--<div class="sort-dict ml-auto" :class="{ '--desc': internal.fieldsOrder[field.label] === 'desc' }"/>-->
             </div>
           </div>
         </draggable>
@@ -43,9 +44,10 @@
       <div class="left-col" v-if="showSettings">
         <draggable v-model="internal.rowFields" :options="{ group: 'fields' }" @start="_start" @end="_end" class="d-flex flex-column align-items-start drag-area border-primary" :class="dragAreaClass">
           <div v-for="field in internal.rowFields" :key="'row-' + field.label">
-            <div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" :title="field.label" @click="_fieldClicked(field.label)">
+            <!--<div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" :title="field.label" @click="_fieldClicked(field.label)">-->
+            <div class="btn btn-draggable btn-primary btn-sm btn-block d-flex align-items-center" :title="field.label">
               <div class="btn-label text-truncate mr-2">{{ field.label }}</div>
-              <div class="sort-dict" :class="{ '--desc': internal.fieldsOrder[field.label] === 'desc' }"/>
+              <!--<div class="sort-dict" :class="{ '--desc': internal.fieldsOrder[field.label] === 'desc' }"/>-->
             </div>
           </div>
         </draggable>
@@ -243,7 +245,7 @@ export default {
              return { ...field, sort: (x, y) => naturalSort(y, x) }
           } else if (field.label && fieldsOrder[field.label] && fieldsOrder[field.label] === 'naturalSort_desc') {
              return { ...field, sort: (x, y) => naturalSort(y, x)*(-1) }
-          }else {
+          } else {
             return { ...field, sort: function() {return 1;} }
           }
         })
