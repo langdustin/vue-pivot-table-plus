@@ -12,7 +12,7 @@
       {{ overNumOfCellsWarningText }}
     </div>
     <div v-else>
-      <div v-if="showTooManyWarning" style="font-style: italic; font-weight: 300;">Achtung: es werden nicht alle Daten angezeigt, sondern nur die ersten 200 Spalten und 3000 Zeilen</div>
+      <div v-if="showTooManyWarning" style="font-style: italic; font-weight: 300;">Achtung: es werden nicht alle Daten angezeigt, sondern nur die ersten 100 Spalten und 1000 Zeilen</div>
       <table class="table table-hover table-bordered table-sm">
         <!-- Table header -->
         <thead>
@@ -121,7 +121,7 @@ export default {
     },
     numOfCellsLimitation: {
       type: Number,
-      default: 10000
+      default: 100000
     },
     isDataLoading: {
       type: Boolean,
@@ -186,7 +186,7 @@ export default {
         let self = this
         values.every(value => {
           // stop building, if there are too many columns to avoid performance issues
-          if (iCols == 200) {
+          if (iCols == 100) {
             self.showTooManyWarning = true
             return false;
           }
@@ -224,7 +224,7 @@ export default {
         let self = this
         values.every(value => {
           // iRows building, if there are too many columns to avoid performance issues
-          if (iRows == 3000) {
+          if (iRows == 1000) {
             self.showTooManyWarning = true
             return false;
           }
